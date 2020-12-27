@@ -12,7 +12,7 @@ jobs:
     name: Auto-update master data
     env:
       MY_SECRET: ${{ secrets.commit_secret }}
-      API_KEY: ${{ secrets.api_key }}
+      BEARER_TOKEN: ${{ secrets.bearer_token }}
       USER_NAME: githubaction
       USER_EMAIL: githubaction@fake.com
       PUBLISH_DIR: artifacts
