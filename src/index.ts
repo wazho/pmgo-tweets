@@ -41,7 +41,7 @@ const getMediaTweets = async (tweetIds: string[]): Promise<any[]> => {
     media: mediaList.find((media: any) => {
       const mediaKeys = tweet.attachments?.media_keys || [];
       const foundMedia = mediaKeys.includes(media.media_key);
-      return {
+      return foundMedia && {
         type: foundMedia.type,
         url: foundMedia.url,
       };
