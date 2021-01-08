@@ -8,10 +8,13 @@ const AuthToken = String(process.env.BEARER_TOKEN);
 
 const getTweets = async (userId: string): Promise<any[]> => {
   const url = `https://api.twitter.com/2/users/${userId}/tweets`;
-  const response = await fetch(url, {
+  const searchParams = new URLSearchParams({
+    'max_results': '20',
+  });
+  const response = await fetch(`${url}?${searchParams}`, {
     method: 'GET',
     headers: {
-      Authorization: AuthToken,
+      Authorization: `Bearer ${AuthToken}`,
     },
   });
   const { data: tweets } = await response.json();
@@ -30,7 +33,7 @@ const getMediaTweets = async (tweetIds: string[]): Promise<any[]> => {
   const response = await fetch(`${url}?${searchParams}`, {
     method: 'GET',
     headers: {
-      Authorization: AuthToken,
+      Authorization: `Bearer ${AuthToken}`,
     },
   });
   const { data: tweets, includes: { media: mediaList } } = await response.json();
@@ -60,13 +63,15 @@ const main = async () => {
   for await (const twitterUser of TWITTER_USERS) {
     const tweetIds = (await getTweets(twitterUser.id)).map((tweet) => tweet.id);
     const tweets = await getMediaTweets(tweetIds);
+    const mediaTweets = tweets.filter((tweet) => tweet.media).slice(0, 10);
     tweetList.push({
       name: twitterUser.username,
-      tweets,
+      tweets: mediaTweets,
     });
   }
 
-  await writeFile(`${outputPath}/tweet-list.json`, JSON.stringify(tweetList));
+  await writeFile(`${outputPath}/tweet-list.min.json`, JSON.stringify(tweetList));
+  await writeFile(`${outputPath}/tweet-list.json`, JSON.stringify(tweetList, null, 2));
 };
 
 main();
