@@ -41,13 +41,10 @@ const getMediaTweets = async (tweetIds: string[]): Promise<any[]> => {
   const formattedTweets = tweets.map((tweet: any) => ({
     id: tweet.id,
     text: tweet.text,
-    media: mediaList.find((media: any) => {
+    mediaList: mediaList.filter((media: any) => {
       const mediaKeys = tweet.attachments?.media_keys || [];
       const foundMedia = mediaKeys.includes(media.media_key);
-      return foundMedia && {
-        type: foundMedia.type,
-        url: foundMedia.url,
-      };
+      return foundMedia;
     }),
     createdAt: tweet.created_at,
   }));
@@ -63,7 +60,7 @@ const main = async () => {
   for await (const twitterUser of TWITTER_USERS) {
     const tweetIds = (await getTweets(twitterUser.id)).map((tweet) => tweet.id);
     const tweets = await getMediaTweets(tweetIds);
-    const mediaTweets = tweets.filter((tweet) => tweet.media).slice(0, 10);
+    const mediaTweets = tweets.filter((tweet) => tweet.mediaList.length).slice(0, 10);
     tweetList.push({
       name: twitterUser.username,
       tweets: mediaTweets,
